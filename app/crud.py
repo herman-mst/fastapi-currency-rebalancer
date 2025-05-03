@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 from typing import List
+from .models import RebalancingReport
 
 # --- Users ---
 def create_user(db: Session, user_in: schemas.UserCreate, hashed_password: str):
@@ -73,3 +74,17 @@ def delete_portfolio(db: Session, portfolio_id: int, user_id: int):
         db.delete(db_port)
         db.commit()
     return db_port
+
+def create_rebalancing_report(
+    db: Session,
+    portfolio_id: int,
+    recommendations: list[dict]
+) -> RebalancingReport:
+    report = RebalancingReport(
+        portfolio_id=portfolio_id,
+        recommendations=recommendations
+    )
+    db.add(report)
+    db.commit()
+    db.refresh(report)
+    return report

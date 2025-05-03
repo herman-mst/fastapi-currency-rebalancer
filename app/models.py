@@ -41,6 +41,7 @@ class PortfolioAsset(Base):
     portfolio_id = Column(Integer, ForeignKey("portfolios.id"), primary_key=True)
     asset_id = Column(Integer, ForeignKey("assets.id"), primary_key=True)
     target_pct = Column(Float, nullable=False)  # целевая доля в портфеле (0.0-1.0)
+    quantity = Column(Float, nullable=False, default=0.0)  # фактическое количество
 
     portfolio = relationship("Portfolio", back_populates="assets")
     asset = relationship("Asset", back_populates="portfolio_assets")
