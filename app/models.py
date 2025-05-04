@@ -32,7 +32,7 @@ class Portfolio(Base):
     name = Column(String, nullable=False)
 
     owner = relationship("User", back_populates="portfolios")
-    assets = relationship("PortfolioAsset", back_populates="portfolio")
+    assets = relationship("PortfolioAsset", back_populates="portfolio", cascade="all, delete-orphan")
     rebalancing_reports = relationship("RebalancingReport", back_populates="portfolio")
 
 class PortfolioAsset(Base):

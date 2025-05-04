@@ -190,11 +190,11 @@ async def rebalance_portfolio(
     # Получаем текущие цены и общую стоимость портфеля
     prices = await fetch_current_prices(symbols)
     total_value = sum(quantities[sym] * prices.get(sym, 0.0) for sym in symbols)
+
     if total_value == 0:
         return schemas.RebalancingReportRead(
             id=0,
             portfolio_id=portfolio_id,
-            generated_at=None,
             recommendations=[],
             message="Total portfolio value is zero — check asset quantities"
         )
