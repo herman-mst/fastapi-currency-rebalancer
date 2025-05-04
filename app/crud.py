@@ -120,8 +120,8 @@ def create_portfolio(db: Session, user_id: int, portfolio_in: schemas.PortfolioC
     for item in portfolio_in.assets:
         db_ass = models.PortfolioAsset(
             portfolio_id=db_port.id,
-            asset_id=item["asset_id"],
-            target_pct=item["target_pct"]
+            asset_id=item.asset_id,
+            target_pct=item.target_pct
         )
         db.add(db_ass)
     db.commit()
