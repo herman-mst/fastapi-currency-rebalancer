@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from decouple import config
+import os
 
 from passlib.context import CryptContext
 from jose import JWTError, jwt
@@ -41,9 +41,9 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 # === JWT ===
-SECRET_KEY = config("JWT_SECRET_KEY", default="CHANGE_ME")
-ALGORITHM = config("JWT_ALGORITHM", default="HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(config("ACCESS_TOKEN_EXPIRE_MINUTES", default=60))
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "CHANGE_ME")
+ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
 
 bearer_scheme = HTTPBearer(description="Enter your JWT token")
 
