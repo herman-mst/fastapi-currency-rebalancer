@@ -14,7 +14,7 @@ class UserRead(BaseModel):
     risk_tolerance: float = Field(..., ge=0.0, le=1.0, description="User's risk tolerance (0 to 1)")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TokenRequest(BaseModel):
     email: EmailStr = Field(..., description="User's email address")
@@ -41,7 +41,7 @@ class AssetRead(AssetBase):
     id: int = Field(..., description="Unique asset identifier")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- PortfolioAsset ---
 class PortfolioAssetCreate(BaseModel):
@@ -55,7 +55,7 @@ class PortfolioAssetRead(BaseModel):
     quantity: float = Field(..., ge=0.0, description="Actual quantity of the asset")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Portfolio ---
 class PortfolioCreate(BaseModel):
@@ -66,7 +66,7 @@ class PortfolioCreate(BaseModel):
     )
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "My Portfolio",
                 "assets": [
@@ -85,7 +85,7 @@ class PortfolioRead(BaseModel):
     assets: List[PortfolioAssetRead] = Field(default_factory=list, description="List of portfolio assets")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Recommendation ---
 class Recommendation(BaseModel):
@@ -107,4 +107,4 @@ class RebalancingReportRead(BaseModel):
     )
 
     class Config:
-        orm_mode = True
+        from_attributes = True
