@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.db import engine, Base
-from app.routes import users, assets, portfolios
+from app.db import Base, engine
+from app.routes import assets, portfolios, users
 
 # Создание таблицы в базе данных
 Base.metadata.create_all(bind=engine)

@@ -1,9 +1,26 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, JSON
+"""
+Module containing SQLAlchemy models for the FastAPI currency rebalancer project.
+All models represent database tables and include basic documentation.
+"""
+import datetime
+from sqlalchemy import (
+    Column, Integer, String, Float, ForeignKey, DateTime, JSON
+)
 from sqlalchemy.orm import relationship
 from .db import Base
-import datetime
 
+# pylint: disable=too-few-public-methods
 class User(Base):
+    """
+    User model representing an application user.
+
+    Attributes:
+        id (int): Primary key.
+        email (str): User's email address.
+        password_hash (str): Hashed password.
+        risk_tolerance (float): User's risk tolerance.
+        portfolios (list): Related portfolios.
+    """
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -13,7 +30,18 @@ class User(Base):
 
     portfolios = relationship("Portfolio", back_populates="owner")
 
+# pylint: disable=too-few-public-methods
 class Asset(Base):
+    """
+    Asset model representing a financial asset.
+
+    Attributes:
+        id (int): Primary key.
+        symbol (str): Asset symbol.
+        type (str): Asset type.
+        volatility (float): Asset volatility.
+        expected_return (float): Expected return of the asset.
+    """
     __tablename__ = "assets"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -24,6 +52,7 @@ class Asset(Base):
 
     portfolio_assets = relationship("PortfolioAsset", back_populates="asset")
 
+# pylint: disable=too-few-public-methods
 class Portfolio(Base):
     __tablename__ = "portfolios"
 
@@ -35,6 +64,7 @@ class Portfolio(Base):
     assets = relationship("PortfolioAsset", back_populates="portfolio", cascade="all, delete-orphan")
     rebalancing_reports = relationship("RebalancingReport", back_populates="portfolio")
 
+# pylint: disable=too-few-public-methods
 class PortfolioAsset(Base):
     __tablename__ = "portfolio_assets"
 
@@ -46,6 +76,7 @@ class PortfolioAsset(Base):
     portfolio = relationship("Portfolio", back_populates="assets")
     asset = relationship("Asset", back_populates="portfolio_assets")
 
+# pylint: disable=too-few-public-methods
 class RebalancingReport(Base):
     __tablename__ = "rebalancing_reports"
 

@@ -1,16 +1,24 @@
+"""
+Module for portfolio routes.
+Handles creation, retrieval, update, deletion and rebalancing of portfolios.
+"""
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import List
 
-from app import crud, schemas, models
-from app.db import get_db
+from app import crud, models, schemas
 from app.core.security import get_current_user
-from app.services.price_service import fetch_current_prices, fetch_historical_prices
+from app.db import get_db
 from app.services.optimization_service import compute_optimal_weights
+from app.services.price_service import (
+    fetch_current_prices,
+    fetch_historical_prices
+)
 
 router = APIRouter(prefix="/portfolios", tags=["portfolios"])
 
-@router.post("/", response_model=schemas.PortfolioRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=schemas.PortfolioRead, 
+             status_code=status.HTTP_201_CREATED)
 def create_portfolio(
     portfolio_in: schemas.PortfolioCreate,
     db: Session = Depends(get_db),
@@ -149,12 +157,19 @@ def delete_portfolio(
     port = crud.delete_portfolio(db, portfolio_id, current_user.id)
     if not port:
         raise HTTPException(status_code=404, detail="Portfolio not found")
-    return None
 
-@router.post("/{portfolio_id}/rebalance", response_model=schemas.RebalancingReportRead)
+@router.post(
+    "/{portfolio_id}/rebalance",
+    response_model=schemas.RebalancingReportRead
+)
 async def rebalance_portfolio(
     portfolio_id: int,
-    days: int = Query(30, ge=5, le=365, description="Number of days of historical data to use"),
+    days: int = Query(
+        30,
+        ge=5,
+        le=365,
+        description="Number of days of historical data to use"
+    ),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
@@ -176,6 +191,7 @@ async def rebalance_portfolio(
         including the current and target percentages, actions to take (buy/sell),
         and the amounts in units and value for each asset.
     """
+    # pylint: disable=too-many-locals
     # Получаем портфель пользователя
     port = crud.get_portfolio(db, portfolio_id, current_user.id)
     if not port:
@@ -189,7 +205,10 @@ async def rebalance_portfolio(
 
     # Получаем текущие цены и общую стоимость портфеля
     prices = await fetch_current_prices(symbols)
-    total_value = sum(quantities[sym] * prices.get(sym, 0.0) for sym in symbols)
+    total_value = sum(
+        quantities[sym] * prices.get(sym, 0.0)
+        for sym in symbols
+    )
 
     if total_value == 0:
         return schemas.RebalancingReportRead(

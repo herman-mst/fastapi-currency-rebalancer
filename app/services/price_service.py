@@ -1,13 +1,17 @@
+import os
+import asyncio
+from datetime import datetime
+
 import httpx
 import pandas as pd
-from datetime import datetime
-import asyncio
-import os
 
 COINGECKO_API = os.getenv("COINGECKO_API", "https://api.coingecko.com/api/v3")
-MAX_RETRIES = int(os.getenv("MAX_RETRIES", 3))
+MAX_RETRIES = int(os.getenv("MAX_RETRIES", "3"))
 
-async def _get_with_retries(client: httpx.AsyncClient, url: str, params: dict) -> httpx.Response:
+async def _get_with_retries(
+        client: httpx.AsyncClient, 
+        url: str, params: dict
+) -> httpx.Response:
     """
     Perform an HTTP GET request with retry logic for handling rate-limiting responses.
 
@@ -35,7 +39,10 @@ async def _get_with_retries(client: httpx.AsyncClient, url: str, params: dict) -
     resp.raise_for_status()
     return resp
 
-async def fetch_current_prices(symbols: list[str], vs_currency: str = "usd") -> dict[str, float]:
+async def fetch_current_prices(
+        symbols: list[str], 
+        vs_currency: str = "usd"
+) -> dict[str, float]:
     """
     Fetch the current prices of the specified cryptocurrency symbols in the given currency.
 
@@ -56,7 +63,11 @@ async def fetch_current_prices(symbols: list[str], vs_currency: str = "usd") -> 
         data = resp.json()
     return {sym: data.get(sym, {}).get(vs_currency, 0.0) for sym in symbols}
 
-async def fetch_historical_prices(symbols: list[str], vs_currency: str = "usd", days: int = 30) -> pd.DataFrame:
+async def fetch_historical_prices(
+        symbols: list[str], 
+        vs_currency: str = "usd", 
+        days: int = 30
+) -> pd.DataFrame:
     """
     Fetch historical price data for a list of cryptocurrency symbols.
     This function retrieves historical price data for the specified cryptocurrencies
@@ -70,9 +81,6 @@ async def fetch_historical_prices(symbols: list[str], vs_currency: str = "usd", 
     Returns:
         pd.DataFrame: A pandas DataFrame containing historical price data. Each column
         corresponds to a cryptocurrency symbol, and the rows are indexed by date.
-    Raises:
-        httpx.HTTPError: If there is an issue with the HTTP request to the CoinGecko API.
-        ValueError: If the response from the API does not contain valid price data.
     """
     tasks = []
     async with httpx.AsyncClient() as client:

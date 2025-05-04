@@ -1,9 +1,13 @@
-import cvxpy as cp
 import numpy as np
 import pandas as pd
+import cvxpy as cp
 from app.core.constants import EPS_ZERO
 
-def compute_optimal_weights(price_history: pd.DataFrame, target_return: float = None, risk_tolerance: float = 0.5) -> dict[str, float]:
+def compute_optimal_weights(
+        price_history: pd.DataFrame, 
+        target_return: float = None, 
+        risk_tolerance: float = 0.5
+) -> dict[str, float]:
     """
     Compute the optimal portfolio weights to minimize risk while considering a target return 
     and risk tolerance using mean-variance optimization.
@@ -28,14 +32,14 @@ def compute_optimal_weights(price_history: pd.DataFrame, target_return: float = 
 
     # 2. Вычисляем статистики для модели Марковица
     mu = returns.mean().values  # Ожидаемая доходность активов (вектор средних)
-    Sigma = returns.cov().values  # Ковариационная матрица доходностей
+    sigma = returns.cov().values  # Ковариационная матрица доходностей
     n = len(mu)  # Количество активов
 
     # 3. Определяем переменные оптимизации: веса активов в портфеле
     w = cp.Variable(n)
 
     # 4. Формируем целевую функцию: минимизация риска с учетом доходности
-    portfolio_variance = cp.quad_form(w, Sigma)  # Риск портфеля (дисперсия)
+    portfolio_variance = cp.quad_form(w, sigma)  # Риск портфеля (дисперсия)
     portfolio_return = mu.T @ w  # Ожидаемая доходность портфеля
     # Параметр trade-off: risk_tolerance определяет баланс между риском и доходностью
     gamma = risk_tolerance * 10  # Масштабируем gamma для управления вкладом доходности
