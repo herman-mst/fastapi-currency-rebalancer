@@ -16,6 +16,20 @@ def create_portfolio(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    """
+    Create a new portfolio for the current user.
+
+    Args:
+        portfolio_in (schemas.PortfolioCreate): The data required to create a new portfolio.
+        db (Session): The database session dependency.
+        current_user (models.User): The currently authenticated user.
+
+    Returns:
+        schemas.PortfolioRead: The newly created portfolio.
+
+    Raises:
+        HTTPException: If the user is not authenticated or if there is an issue with the portfolio creation.
+    """
     return crud.create_portfolio(db, current_user.id, portfolio_in)
 
 @router.get("/", response_model=List[schemas.PortfolioRead])
@@ -25,6 +39,18 @@ def read_portfolios(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    """
+    Retrieve a list of portfolios for the current user.
+
+    Args:
+        skip (int, optional): The number of records to skip. Defaults to 0.
+        limit (int, optional): The maximum number of records to return. Defaults to 100.
+        db (Session): The database session dependency.
+        current_user (models.User): The currently authenticated user dependency.
+
+    Returns:
+        List[models.Portfolio]: A list of portfolio objects belonging to the current user.
+    """
     return crud.get_portfolios(db, current_user.id, skip, limit)
 
 @router.get("/{portfolio_id}", response_model=schemas.PortfolioRead)
@@ -33,6 +59,20 @@ def read_portfolio(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    """
+    Retrieve a portfolio by its ID.
+
+    Args:
+        portfolio_id (int): The ID of the portfolio to retrieve.
+        db (Session): The database session dependency.
+        current_user (models.User): The currently authenticated user.
+
+    Returns:
+        schemas.PortfolioRead: The portfolio data if found.
+
+    Raises:
+        HTTPException: If the portfolio is not found, raises a 404 error.
+    """
     port = crud.get_portfolio(db, portfolio_id, current_user.id)
     if not port:
         raise HTTPException(status_code=404, detail="Portfolio not found")
@@ -45,18 +85,33 @@ def update_portfolio(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    # Загрузить и проверить наличие портфеля
+    """
+    Updates an existing portfolio with new data.
+    Args:
+        portfolio_id (int): The ID of the portfolio to update.
+        portfolio_in (schemas.PortfolioCreate): The new data for the portfolio, including its name and assets.
+        db (Session): The database session dependency.
+        current_user (models.User): The currently authenticated user.
+    Raises:
+        HTTPException: If the portfolio with the given ID does not exist or does not belong to the current user.
+    Returns:
+        schemas.PortfolioRead: The updated portfolio data.
+    """
+    # Загрузить портфель из базы данных и проверить его существование
     port = crud.get_portfolio(db, portfolio_id, current_user.id)
     if not port:
         raise HTTPException(status_code=404, detail="Portfolio not found")
-    # Обновить имя
+    
+    # Обновить имя портфеля
     port.name = portfolio_in.name
-    # Удалить старые позиции
+    
+    # Удалить все старые позиции (активы) из портфеля
     db.query(models.PortfolioAsset).filter(
         models.PortfolioAsset.portfolio_id == portfolio_id
     ).delete()
     db.commit()
-    # Добавить новые позиции
+    
+    # Добавить новые позиции (активы) в портфель
     for item in portfolio_in.assets:
         pa = models.PortfolioAsset(
             portfolio_id=portfolio_id,
@@ -66,6 +121,8 @@ def update_portfolio(
         )
         db.add(pa)
     db.commit()
+    
+    # Обновить объект портфеля в сессии и вернуть его
     db.refresh(port)
     return port
 
@@ -75,6 +132,20 @@ def delete_portfolio(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    """
+    Deletes a portfolio by its ID for the currently authenticated user.
+
+    Args:
+        portfolio_id (int): The ID of the portfolio to delete.
+        db (Session): The database session dependency.
+        current_user (models.User): The currently authenticated user.
+
+    Raises:
+        HTTPException: If the portfolio is not found (404 status code).
+
+    Returns:
+        None: Indicates successful deletion of the portfolio.
+    """
     port = crud.delete_portfolio(db, portfolio_id, current_user.id)
     if not port:
         raise HTTPException(status_code=404, detail="Portfolio not found")
@@ -87,16 +158,36 @@ async def rebalance_portfolio(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    """
+    Rebalance a portfolio based on historical data and user risk tolerance.
+    This endpoint calculates the optimal asset allocation for a given portfolio
+    and provides recommendations to rebalance the portfolio to achieve the target allocation.
+    Args:
+        portfolio_id (int): The ID of the portfolio to rebalance.
+        days (int, optional): Number of days of historical data to use for calculations.
+            Must be between 5 and 365. Defaults to 30.
+        db (Session): Database session dependency.
+        current_user (models.User): The currently authenticated user.
+    Raises:
+        HTTPException: If the portfolio is not found (404).
+        HTTPException: If the portfolio has no assets (400).
+    Returns:
+        schemas.RebalancingReportRead: A report containing rebalancing recommendations,
+        including the current and target percentages, actions to take (buy/sell),
+        and the amounts in units and value for each asset.
+    """
+    # Получаем портфель пользователя
     port = crud.get_portfolio(db, portfolio_id, current_user.id)
     if not port:
         raise HTTPException(404, "Portfolio not found")
 
+    # Извлекаем символы активов и их количество
     symbols = [pa.asset.symbol.lower() for pa in port.assets]
     quantities = {pa.asset.symbol.lower(): pa.quantity for pa in port.assets}
     if not symbols:
         raise HTTPException(400, "Portfolio has no assets")
 
-    # 1) Получаем текущие цены и total_value
+    # Получаем текущие цены и общую стоимость портфеля
     prices = await fetch_current_prices(symbols)
     total_value = sum(quantities[sym] * prices.get(sym, 0.0) for sym in symbols)
     if total_value == 0:
@@ -105,19 +196,19 @@ async def rebalance_portfolio(
             portfolio_id=portfolio_id,
             generated_at=None,
             recommendations=[],
-            message="Total portfolio value is zero — проверьте quantity активов"
+            message="Total portfolio value is zero — check asset quantities"
         )
 
-    # 2) Получаем историю цен за N дней
+    # Получаем историю цен за указанный период (N дней)
     hist = await fetch_historical_prices(symbols, days=days)
 
-    # 3) Считаем оптимальные веса
+    # Рассчитываем оптимальные веса активов
     weights = compute_optimal_weights(
         price_history=hist,
         risk_tolerance=current_user.risk_tolerance
     )
 
-    # 4) Формируем рекомендации
+    # Формируем рекомендации по ребалансировке
     recommendations = []
     for sym in symbols:
         current_pct = (quantities[sym] * prices[sym]) / total_value
@@ -135,5 +226,6 @@ async def rebalance_portfolio(
             "amount_value": value
         })
 
+    # Сохраняем отчет о ребалансировке в базе данных
     report = crud.create_rebalancing_report(db, portfolio_id, recommendations)
     return report

@@ -9,7 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
-    risk_tolerance = Column(Float, default=0.5)  # значение от 0 (консервативный) до 1 (агрессивный)
+    risk_tolerance = Column(Float, default=0.5)
 
     portfolios = relationship("Portfolio", back_populates="owner")
 
@@ -18,7 +18,7 @@ class Asset(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     symbol = Column(String, unique=True, index=True, nullable=False)
-    type = Column(String, nullable=False)  # 'fiat' или 'crypto'
+    type = Column(String, nullable=False)
     volatility = Column(Float, nullable=False)
     expected_return = Column(Float, nullable=False)
 
@@ -40,8 +40,8 @@ class PortfolioAsset(Base):
 
     portfolio_id = Column(Integer, ForeignKey("portfolios.id"), primary_key=True)
     asset_id = Column(Integer, ForeignKey("assets.id"), primary_key=True)
-    target_pct = Column(Float, nullable=False)  # целевая доля в портфеле (0.0-1.0)
-    quantity = Column(Float, nullable=False, default=0.0)  # фактическое количество
+    target_pct = Column(Float, nullable=False)
+    quantity = Column(Float, nullable=False, default=0.0)
 
     portfolio = relationship("Portfolio", back_populates="assets")
     asset = relationship("Asset", back_populates="portfolio_assets")
@@ -52,6 +52,6 @@ class RebalancingReport(Base):
     id = Column(Integer, primary_key=True, index=True)
     portfolio_id = Column(Integer, ForeignKey("portfolios.id"), nullable=False)
     generated_at = Column(DateTime, default=datetime.datetime.utcnow)
-    recommendations = Column(JSON, nullable=False)  # формат: {"symbol": {"current_pct": ..., "target_pct": ..., "action": ..., "amount": ...}}
+    recommendations = Column(JSON, nullable=False)
 
     portfolio = relationship("Portfolio", back_populates="rebalancing_reports")

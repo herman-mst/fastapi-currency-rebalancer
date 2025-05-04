@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from app.db import engine, Base
 from app.routes import users, assets, portfolios
 
-# создаём все таблицы (для dev)
+# Создание таблицы в базе данных
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Currency Rebalancer API")
 
-# Подключаем роутеры
+# Подключение маршрутов
 app.include_router(users.router)
 app.include_router(assets.router)
 app.include_router(portfolios.router)
