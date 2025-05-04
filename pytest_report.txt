@@ -1,0 +1,69 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-8.3.5, pluggy-1.5.0
+rootdir: D:\Desktop\УЧЕБА\Учеба 4 курс\Программирование на Python\FastAPI проект\fastapi-currency-rebalancer
+plugins: anyio-4.9.0, cov-6.1.1
+collected 4 items
+
+tests\test_api.py ....                                                   [100%]
+
+============================== warnings summary ===============================
+app\db.py:13
+  D:\Desktop\УЧЕБА\Учеба 4 курс\Программирование на Python\FastAPI проект\fastapi-currency-rebalancer\app\db.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\pydantic\_internal\_config.py:323
+C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\pydantic\_internal\_config.py:323
+C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\pydantic\_internal\_config.py:323
+C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\pydantic\_internal\_config.py:323
+C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\pydantic\_internal\_config.py:323
+C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\pydantic\_internal\_config.py:323
+  C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+tests/test_api.py::test_user_registration_and_login
+tests/test_api.py::test_assets_crud
+tests/test_api.py::test_portfolio_crud
+tests/test_api.py::test_rebalance_endpoint
+  D:\Desktop\УЧЕБА\Учеба 4 курс\Программирование на Python\FastAPI проект\fastapi-currency-rebalancer\app\core\security.py:65: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
+tests/test_api.py::test_assets_crud
+tests/test_api.py::test_portfolio_crud
+tests/test_api.py::test_portfolio_crud
+tests/test_api.py::test_rebalance_endpoint
+tests/test_api.py::test_rebalance_endpoint
+  D:\Desktop\УЧЕБА\Учеба 4 курс\Программирование на Python\FastAPI проект\fastapi-currency-rebalancer\app\crud.py:67: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    db_asset = models.Asset(**asset_in.dict())
+
+tests/test_api.py: 12 warnings
+  D:\Desktop\УЧЕБА\Учеба 4 курс\Программирование на Python\FastAPI проект\fastapi-currency-rebalancer\app\services\price_service.py:89: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    dates = [datetime.utcfromtimestamp(p[0] / 1000).date() for p in prices]
+
+tests/test_api.py::test_rebalance_endpoint
+  C:\Users\mgs11\anaconda3\envs\fastapi\Lib\site-packages\sqlalchemy\sql\schema.py:3625: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.2-final-0 _______________
+
+Name                                   Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------
+app\api\__init__.py                        0      0   100%
+app\core\__init__.py                       0      0   100%
+app\core\constants.py                      1      0   100%
+app\core\security.py                      39      4    90%   93, 95-96, 100
+app\crud.py                               50      1    98%   166
+app\db.py                                 15      4    73%   16-20
+app\main.py                               11      1    91%   17
+app\models.py                             42      0   100%
+app\routes\__init__.py                     0      0   100%
+app\routes\assets.py                      17      1    94%   70
+app\routes\portfolios.py                  67     10    85%   54, 76-79, 103, 151, 182, 188, 195
+app\routes\users.py                       23      3    87%   30, 54, 75
+app\schemas.py                            67      0   100%
+app\services\optimization_service.py      26      2    92%   47, 59
+app\services\price_service.py             44      5    89%   30-32, 35-36
+--------------------------------------------------------------------
+TOTAL                                    402     31    92%
+======================= 4 passed, 29 warnings in 6.79s ========================
