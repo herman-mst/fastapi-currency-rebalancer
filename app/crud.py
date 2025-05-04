@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
-from typing import List
 from .models import RebalancingReport
 
 # --- Users ---
@@ -84,7 +83,7 @@ def get_asset(db: Session, asset_id: int):
     """
     return db.query(models.Asset).filter(models.Asset.id == asset_id).first()
 
-def get_assets(db: Session, skip: int = 0, limit: int = 100) -> List[models.Asset]:
+def get_assets(db: Session, skip: int = 0, limit: int = 100) -> list[models.Asset]:
     """
     Retrieve a list of assets from the database with optional pagination.
 
@@ -94,7 +93,7 @@ def get_assets(db: Session, skip: int = 0, limit: int = 100) -> List[models.Asse
         limit (int, optional): The maximum number of records to return. Defaults to 100.
 
     Returns:
-        List[models.Asset]: A list of Asset objects retrieved from the database.
+        list[models.Asset]: A list of Asset objects retrieved from the database.
     """
     return db.query(models.Asset).offset(skip).limit(limit).all()
 
@@ -158,7 +157,7 @@ def get_portfolios(db: Session, user_id: int, skip: int = 0, limit: int = 100):
         limit (int, optional): The maximum number of records to return. Defaults to 100.
 
     Returns:
-        List[Portfolio]: A list of Portfolio objects belonging to the specified user.
+        list[Portfolio]: A list of Portfolio objects belonging to the specified user.
     """
     return (
         db.query(models.Portfolio)

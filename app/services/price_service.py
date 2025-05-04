@@ -1,7 +1,6 @@
 import httpx
 import pandas as pd
 from datetime import datetime
-from typing import List, Dict
 import asyncio
 
 COINGECKO_API = "https://api.coingecko.com/api/v3"
@@ -23,7 +22,7 @@ async def _get_with_retries(client: httpx.AsyncClient, url: str, params: dict) -
         httpx.HTTPStatusError: If the response status code is not successful after retries.
     """
     backoff = 10
-    for attempt in range(1, MAX_RETRIES + 1):
+    for _ in range(1, MAX_RETRIES + 1):
         resp = await client.get(url, params=params, timeout=10.0)
         # TODO: как-то решить проблему с rate limit
         if resp.status_code == 429:
@@ -35,12 +34,12 @@ async def _get_with_retries(client: httpx.AsyncClient, url: str, params: dict) -
     resp.raise_for_status()
     return resp
 
-async def fetch_current_prices(symbols: List[str], vs_currency: str = "usd") -> dict[str, float]:
+async def fetch_current_prices(symbols: list[str], vs_currency: str = "usd") -> dict[str, float]:
     """
     Fetch the current prices of the specified cryptocurrency symbols in the given currency.
 
     Args:
-        symbols (List[str]): A list of cryptocurrency symbols (e.g., ["bitcoin", "ethereum"]).
+        symbols (list[str]): A list of cryptocurrency symbols (e.g., ["bitcoin", "ethereum"]).
         vs_currency (str, optional): The target currency to convert the prices into. Defaults to "usd".
 
     Returns:
@@ -56,7 +55,7 @@ async def fetch_current_prices(symbols: List[str], vs_currency: str = "usd") -> 
         data = resp.json()
     return {sym: data.get(sym, {}).get(vs_currency, 0.0) for sym in symbols}
 
-async def fetch_historical_prices(symbols: List[str], vs_currency: str = "usd", days: int = 30) -> pd.DataFrame:
+async def fetch_historical_prices(symbols: list[str], vs_currency: str = "usd", days: int = 30) -> pd.DataFrame:
     """
     Fetch historical price data for a list of cryptocurrency symbols.
     This function retrieves historical price data for the specified cryptocurrencies
@@ -64,7 +63,7 @@ async def fetch_historical_prices(symbols: List[str], vs_currency: str = "usd", 
     pandas DataFrame, where each column corresponds to a cryptocurrency symbol, and
     the rows represent daily prices indexed by date.
     Args:
-        symbols (List[str]): A list of cryptocurrency symbols (e.g., ["bitcoin", "ethereum"]).
+        symbols (list[str]): A list of cryptocurrency symbols (e.g., ["bitcoin", "ethereum"]).
         vs_currency (str, optional): The currency to compare against (default is "usd").
         days (int, optional): The number of days of historical data to fetch (default is 30).
     Returns:

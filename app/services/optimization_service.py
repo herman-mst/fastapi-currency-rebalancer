@@ -1,11 +1,10 @@
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-from typing import List, Dict
 
 EPS_ZERO = 1e-6  # для обработки нулей в ценах
 
-def compute_optimal_weights(price_history: pd.DataFrame, target_return: float = None, risk_tolerance: float = 0.5) -> Dict[str, float]:
+def compute_optimal_weights(price_history: pd.DataFrame, target_return: float = None, risk_tolerance: float = 0.5) -> dict[str, float]:
     """
     Compute the optimal portfolio weights to minimize risk while considering a target return 
     and risk tolerance using mean-variance optimization.
@@ -17,7 +16,7 @@ def compute_optimal_weights(price_history: pd.DataFrame, target_return: float = 
         risk_tolerance (float, optional): A parameter controlling the trade-off between 
             risk and return. Higher values prioritize return over risk. Defaults to 0.5.
     Returns:
-        Dict[str, float]: A dictionary mapping asset tickers (columns of `price_history`) 
+        dict[str, float]: A dictionary mapping asset tickers (columns of `price_history`) 
         to their respective optimal weights in the portfolio.
     Notes:
         - The function uses log-returns for calculations.
