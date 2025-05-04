@@ -2,9 +2,10 @@ import httpx
 import pandas as pd
 from datetime import datetime
 import asyncio
+from decouple import config
 
-COINGECKO_API = "https://api.coingecko.com/api/v3"
-MAX_RETRIES = 3
+COINGECKO_API = config("COINGECKO_API", default="https://api.coingecko.com/api/v3")
+MAX_RETRIES = int(config("MAX_RETRIES", default=3))
 
 async def _get_with_retries(client: httpx.AsyncClient, url: str, params: dict) -> httpx.Response:
     """

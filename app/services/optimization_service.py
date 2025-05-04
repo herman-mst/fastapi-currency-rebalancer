@@ -1,8 +1,7 @@
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-
-EPS_ZERO = 1e-6  # для обработки нулей в ценах
+from app.core.constants import EPS_ZERO
 
 def compute_optimal_weights(price_history: pd.DataFrame, target_return: float = None, risk_tolerance: float = 0.5) -> dict[str, float]:
     """
