@@ -72,3 +72,39 @@ def read_users_me(
         models.User: The currently authenticated user's data.
     """
     return current_user
+
+@router.put("/me", response_model=schemas.UserRead)
+def update_user_me(
+    user_in: schemas.UserUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Updates the current user information.
+
+    Args:
+        user_in (schemas.UserUpdate): The user update schema containing updated fields.
+        current_user (models.User): The currently authenticated user.
+        db (Session): The database session.
+
+    Returns:
+        models.User: The updated user object.
+    """
+    return crud.update_user(db, current_user, user_in)
+
+@router.delete("/me", response_model=schemas.UserRead)
+def delete_user_me(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Deletes the current user account.
+
+    Args:
+        current_user (models.User): The currently authenticated user.
+        db (Session): The database session.
+
+    Returns:
+        models.User: The deleted user object.
+    """
+    return crud.delete_user(db, current_user.id)

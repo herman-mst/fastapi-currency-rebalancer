@@ -231,3 +231,18 @@ class RebalancingReportRead(BaseModel):
     # pylint: disable=missing-class-docstring
     class Config:
         from_attributes = True
+
+# pylint: disable=too-few-public-methods
+class UserUpdate(BaseModel):
+    """Schema for updating a user."""
+    email: Optional[EmailStr] = Field(
+        None, description="New email address for the user"
+    )
+    risk_tolerance: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="New risk tolerance (0 to 1) for the user"
+    )
+
+# pylint: disable=too-few-public-methods
+class UserDelete(BaseModel):
+    """Schema for deleting a user."""
+    ...

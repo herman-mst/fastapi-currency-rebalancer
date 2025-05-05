@@ -51,6 +51,43 @@ def get_user_by_email(db: Session, email: str):
     """
     return db.query(models.User).filter(models.User.email == email).first()
 
+def update_user(db: Session, db_user: models.User, user_in: schemas.UserUpdate):
+    """
+    Updates user data in the database.
+    
+    Args:
+        db (Session): The database session.
+        db_user (models.User): The current user object from the database.
+        user_in (schemas.UserUpdate): An object containing the new user data.
+        
+    Returns:
+        models.User: The updated user object.
+    """
+    if user_in.email is not None:
+        db_user.email = user_in.email
+    if hasattr(user_in, 'risk_tolerance') and user_in.risk_tolerance is not None:
+        db_user.risk_tolerance = user_in.risk_tolerance
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def delete_user(db: Session, user_id: int):
+    """
+    Deletes a user from the database.
+    
+    Args:
+        db (Session): The database session.
+        user_id (int): The ID of the user to be deleted.
+    
+    Returns:
+        models.User: The deleted user object if found, otherwise None.
+    """
+    db_user = get_user(db, user_id)
+    if db_user:
+        db.delete(db_user)
+        db.commit()
+    return db_user
+
 # --- Assets ---
 def create_asset(db: Session, asset_in: schemas.AssetCreate):
     """
