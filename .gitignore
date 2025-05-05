@@ -1,9 +1,17 @@
+# Файлы Python
 __pycache__
 *.pyc
 
+# Файлы среды разработки
 .vscode
 
+# Файлы переменных среды
+.env
+
+# Файлы баз данных
 *.db
 
+# Файлы тестирования
 .coverage
 .pylintrc
+*_report.txt
