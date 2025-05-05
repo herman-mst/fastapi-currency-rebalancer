@@ -108,6 +108,12 @@ uvicorn app.main:app --reload
   alembic upgrade head
   ```
 
+## ER Диаграмма
+
+Ниже приведена ER-диаграмма базы данных проекта:
+
+![ER диаграмма](ER.png)
+
 ## Тестирование
 
 Запустите тесты с помощью Pytest:
