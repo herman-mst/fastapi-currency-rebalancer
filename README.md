@@ -32,7 +32,7 @@ Currency Rebalancer API — это RESTful сервис для управлен�
 1. **Клонируйте репозиторий:**
 
    ```sh
-   git clone <URL репозитория>
+   git clone https://github.com/herman-mst/fastapi-currency-rebalancer
    cd fastapi-currency-rebalancer
    ```
 
